@@ -10,8 +10,8 @@ services:
         - MQTT_PASSWORD=${MQTT_PASSWORD}
     container_name: homemonitor-mqtt
     ports:
-      - '1884:1883'
-      - '9004:9003'
+      - '1883:1883'
+      - '9003:9003'
     volumes:
       # - /mosquitto/config
       - /mosquitto/data
