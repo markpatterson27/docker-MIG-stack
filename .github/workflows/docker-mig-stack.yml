@@ -51,4 +51,4 @@ jobs:
 
       # check influxdb
       - name: Check database created in influxdb
-        run: docker exec migstack_influxdb influx -execute "SHOW DATABASES" | grep -q MIQStack
+        run: docker exec influxdb influx -execute "SHOW DATABASES" | grep -q MIQStack
