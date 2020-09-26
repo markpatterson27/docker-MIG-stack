@@ -18,19 +18,19 @@ services:
       - /mosquitto/log
     restart: unless-stopped
 
-    influxdb:
-      build: ./influxdb
-      # image: influxdb:alpine
-      container_name: influxdb
-      # ports:
-      #   - '8086:8086'
-      volumes:
-        - influxdb_data:/var/lib/influxdb
-      environment:
-        # INFLUXDB_DB: ${INFLUXDB_DATABASE}
-        - DEFAULT_DATABASE=${INFLUXDB_DATABASE}
-        - INFLUXDB_DATA_INDEX_VERSION=tsi1
-      restart: unless-stopped
+  influxdb:
+    build: ./influxdb
+    # image: influxdb:alpine
+    container_name: influxdb
+    # ports:
+    #   - '8086:8086'
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    environment:
+      # INFLUXDB_DB: ${INFLUXDB_DATABASE}
+      - DEFAULT_DATABASE=${INFLUXDB_DATABASE}
+      - INFLUXDB_DATA_INDEX_VERSION=tsi1
+    restart: unless-stopped
 
 volumes:
   influxdb_data:
