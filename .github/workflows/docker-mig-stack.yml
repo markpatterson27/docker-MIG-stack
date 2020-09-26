@@ -52,3 +52,17 @@ jobs:
       # check influxdb
       - name: Check database created in influxdb
         run: docker exec migstack_influxdb_1 influx -execute "SHOW DATABASES" | grep -q MIQStack
+      
+      # check forwarder forwards messages
+      - name: publish sensor readings message
+        run: |
+          MESSAGE="{\"meta-data\":{\"device\":\"test\"},\"measures\":{\"sensor1\":5,\"sensor2\":43}}"
+          mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
+          
+      - name: Check sensor-readings table exists
+        run: docker exec migstack_influxdb_1 influx -database MIGStack -execute "SHOW MEASUREMENTS" | grep -q sensor-readings
+
+      - name: Check sensor values in table
+        run: |
+          docker exec migstack_influxdb_1 influx -database "MIGStack" -execute "SELECT SUM(sensor1) FROM \"2_weeks\".\"sensor-readings\" WHERE device = 'test'" | grep -q 5
+          docker exec migstack_influxdb_1 influx -database "MIGStack" -execute "SELECT SUM(sensor2) FROM \"2_weeks\".\"sensor-readings\" WHERE device = 'test'" | grep -q 43
