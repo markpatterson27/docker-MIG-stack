@@ -1,0 +1,3 @@
+# don't copy Dockerfile into container
+Dockerfile
+README.md

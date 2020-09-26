@@ -32,5 +32,17 @@ services:
       - INFLUXDB_DATA_INDEX_VERSION=tsi1
     restart: unless-stopped
 
+  forwarder:
+    build: ./mqtt-influxdb-forwarder
+    container_name: mqttforwarder
+    environment:
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - INFLUXDB_DATABASE=${INFLUXDB_DATABASE}
+    depends_on:
+      - mqtt
+      - influxdb
+    restart: unless-stopped
+
 volumes:
   influxdb_data:
