@@ -25,7 +25,7 @@ All messages on the base topic are subscribed to: i.e. `BASE_TOPIC+'/#'`. The fo
 
 The MQTT payload is expected to be in the format:
 
-```json
+```js
 payload {
     "timestamp": "<timestamp of reading>",
     "meta-data": {
