@@ -1,0 +1,20 @@
+version: "3.8"
+
+services: 
+  mqtt:
+    build:
+      context: ./mqtt
+      dockerfile: Dockerfile
+      args:
+        - MQTT_USERNAME=${MQTT_USERNAME}
+        - MQTT_PASSWORD=${MQTT_PASSWORD}
+    container_name: homemonitor-mqtt
+    ports:
+      - '1884:1883'
+      - '9004:9003'
+    volumes:
+      # - /mosquitto/config
+      - /mosquitto/data
+      - /mosquitto/log
+    restart: unless-stopped
+
