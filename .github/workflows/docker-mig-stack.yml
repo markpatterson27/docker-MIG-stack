@@ -55,17 +55,19 @@ jobs:
 
       # wait for fowarder
       - name: wait for and check forwarder
-        run: mosquitto_sub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/messages -C 1
+        run: mosquitto_sub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/messages -C 1 | grep -q Forwarder
       
       # check forwarder forwards messages
       - name: publish sensor readings message
         run: |
-          sleep 20
+          sleep 10
           MESSAGE="{\"meta-data\":{\"device\":\"test\"},\"measures\":{\"sensor1\":5,\"sensor2\":43}}"
           mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
           
       - name: Check sensor-readings table exists
-        run: docker exec migstack_influxdb_1 influx -database MIGStack -execute "SHOW MEASUREMENTS" | grep -q sensor-readings
+        run: |
+          sleep 10
+          docker exec migstack_influxdb_1 influx -database MIGStack -execute "SHOW MEASUREMENTS" | grep -q sensor-readings
 
       - name: Check sensor values in table
         run: |
