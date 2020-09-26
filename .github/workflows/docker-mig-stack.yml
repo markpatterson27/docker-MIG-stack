@@ -22,16 +22,20 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # install mosquitto
-      - name: Install mosquitto
-        run: sudo apt update && sudo apt-get install -y mosquitto
+      # # install mosquitto
+      # - name: Install mosquitto
+      #   run: sudo apt update && sudo apt-get install -y mosquitto
 
-      # run mosquitto in verbose mode
-      - name: ReStart mosquitto
-        run: |
-          sudo service mosquitto stop
-          sudo systemctl stop mosquitto.service
-          mosquitto -d -v
+      # install mosquitto clients
+      - name: Install mosquitto clients
+        run: sudo apt update && sudo apt-get install -y mosquitto-clients
+
+      # # run mosquitto in verbose mode
+      # - name: ReStart mosquitto
+      #   run: |
+      #     sudo service mosquitto stop
+      #     sudo systemctl stop mosquitto.service
+      #     mosquitto -d -v -p 1888
 
       # build and run stack
       - name: Compose up
