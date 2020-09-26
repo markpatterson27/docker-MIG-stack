@@ -44,3 +44,7 @@ jobs:
       # check that mosquitto can publish a message
       - name: Mosquitto publish
         run: mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/messages -m "hello runner" -d
+
+      # check influxdb
+      - name: Check database created in influxdb
+        run: docker exec migstack_influxdb influx -execute "SHOW DATABASES" | grep -q MIQStack
