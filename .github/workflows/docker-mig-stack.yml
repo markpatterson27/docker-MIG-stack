@@ -73,3 +73,7 @@ jobs:
         run: |
           docker exec migstack_influxdb_1 influx -database "MIGStack" -execute "SELECT SUM(sensor1) FROM \"2_weeks\".\"sensor-readings\" WHERE device = 'test'" | grep -q 5
           docker exec migstack_influxdb_1 influx -database "MIGStack" -execute "SELECT SUM(sensor2) FROM \"2_weeks\".\"sensor-readings\" WHERE device = 'test'" | grep -q 43
+
+      # check grafana running
+      - name: Check grafana cli exists
+        run: docker exec migstack_grafana_1 grafana-cli -v | grep -q "Grafana CLI"
