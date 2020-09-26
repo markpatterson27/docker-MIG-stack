@@ -41,6 +41,10 @@ jobs:
       - name: Compose up
         run: docker-compose -f "docker-compose.yml" up -d --build
 
+      # show running containers
+      - name: show running containers
+        run: docker ps
+
       # check that mosquitto can publish a message
       - name: Mosquitto publish
         run: mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/messages -m "hello runner" -d
