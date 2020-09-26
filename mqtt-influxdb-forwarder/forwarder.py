@@ -16,7 +16,7 @@ MQTT_CLIENT_ID = 'Forwarder'    # MQTT to InfluxDB forwarder
 DB_SERVER = ('influxdb', 8086)   # ip, port
 DB_USER = 'root'
 DB_PASS = 'root'
-DB_NAME = os.getenv('INFLUXDB_DATABASE', 'MIQStack')
+DB_NAME = os.getenv('INFLUXDB_DATABASE', 'MIGStack')
 # DB_TABLE = 'sensor-readings'
 
 subscribe_topic = BASE_TOPIC+'/#'
