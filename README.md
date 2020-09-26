@@ -1,5 +1,7 @@
 # Docker MIG stack
 
+![Stack-Test](https://github.com/markpatterson27/docker-MIG-stack/workflows/Stack-Test/badge.svg)
+
 Docker compose file for setting up a MQTT, InfluxDB, Grafana stack.
 
 <br />
