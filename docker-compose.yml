@@ -43,5 +43,19 @@ services:
       - influxdb
     restart: unless-stopped
 
+  grafana:
+    build: ./grafana
+    # container_name: grafana
+    ports:
+      - '3001:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      # - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment: 
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - INFLUXDB_DATABASE=${INFLUXDB_DATABASE}
+    restart: unless-stopped
+
 volumes:
   influxdb_data:
+  grafana_data:
