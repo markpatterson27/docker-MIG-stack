@@ -31,7 +31,7 @@ jobs:
         run: |
           sudo service mosquitto stop
           sudo systemctl stop mosquitto.service
-          mosquitto -v
+          mosquitto -d -v
 
       # build and run stack
       - name: Compose up
