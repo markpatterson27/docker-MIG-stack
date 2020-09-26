@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Stack-Test
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -22,12 +22,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      # install mosquitto
+      - name: Install mosquitto
+        run: sudo apt update && sudo apt-get install -y mosquitto
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      # run mosquitto in verbose mode
+      - name: Start mosquitto
+        run: mosquitto -v
+
+      # build and run stack
+      - name: Compose up
+        run: docker-compose -f "docker-compose.yml" up -d --build
+
+      # check that mosquitto can publish a message
+      - name: Mosquitto publish
+        run: mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/messages -m "hello runner" -d
