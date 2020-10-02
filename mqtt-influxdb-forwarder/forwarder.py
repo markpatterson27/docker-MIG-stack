@@ -43,7 +43,7 @@ def on_message(client, userdata, msg):
     pass_topics = ['/sensor']
 
     # strip out base topic
-    topic = msg.topic.lstrip(BASE_TOPIC+'/')
+    topic = msg.topic[len(BASE_TOPIC+'/'):]
     if any(pass_topic in topic for pass_topic in pass_topics) and topic != 'messages': # payload on device/sensor
         print(topic)
         message = {
