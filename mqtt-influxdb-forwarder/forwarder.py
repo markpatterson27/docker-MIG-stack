@@ -9,8 +9,8 @@ import os
 
 # define constants
 MQTT_SERVER = ('mqtt', 1883) # ip, port
-MQTT_USERNAME = os.getenv('MQTT_USERNAME')
-MQTT_PASSWORD = os.getenv('MQTT_PASSWORD')
+MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'mqtt')
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', 'password')
 BASE_TOPIC = os.getenv('BASE_TOPIC', 'mig-stack')
 MQTT_CLIENT_ID = 'Forwarder'    # MQTT to InfluxDB forwarder
 DB_SERVER = ('influxdb', 8086)   # ip, port
@@ -31,8 +31,8 @@ def on_connect(client, userdata, flags, rc):
         'device': 'MQTT to InfluxDB forwarder',
         'message type': 'on-connect'
     }
-    mqtt_client.publish(BASE_TOPIC+'/messages', json.dumps(msg))
-    mqtt_client.subscribe(subscribe_topic)
+    client.publish(BASE_TOPIC+'/messages', json.dumps(msg))
+    client.subscribe(subscribe_topic)
     print("Subscribed to topic: " + subscribe_topic)
 
 def on_message(client, userdata, msg):
@@ -100,62 +100,66 @@ def process_queue():
 
             db_payload.append(db_point)
 
-    # return db_payload
-
-    ## encode and send to database
-    print(db_payload)
-    try:
-        db_client.write_points(db_payload)
-        print("Finished writing to InfluxDB")
-    except:
-        print("** Error writing to InfluxDB **")
+    return db_payload
 
 
-# start
-print("Starting MQTT Forwarder...")
-# pause awhile while other containers startup
-time.sleep(50)
+def main():
+    # start
+    print("Starting MQTT Forwarder...")
+    # pause awhile while other containers startup
+    time.sleep(50)
 
-# Set up a client for InfluxDB
-connOK=False
-while(connOK == False):
-    try:
-        db_client = InfluxDBClient(DB_SERVER[0], DB_SERVER[1], DB_USER, DB_PASS, DB_NAME)
-        connOK = True
-    except:
-        connOK = False
-    time.sleep(2)
-print("InfluxDB version: ", db_client.ping())
-
-# check if database exists. if not, create it.
-if any(a['name'] == DB_NAME for a in db_client.get_list_database()):
-    print('Database found: ', DB_NAME)
-else:
-    print('Database not found. Creating...')
-    db_client.create_database(DB_NAME)
-    print('Database {} created'.format(DB_NAME))
-
-# Initialize the MQTT client that should connect to the Mosquitto broker
-mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
-mqtt_client.on_connect = on_connect
-mqtt_client.on_message = on_message
-print('MQTT username: ', MQTT_USERNAME)
-print('MQTT password: ', MQTT_PASSWORD)
-mqtt_client.username_pw_set(username=MQTT_USERNAME, password=MQTT_PASSWORD)
-connOK=False
-while(connOK == False):
-    try:
-        mqtt_client.connect(MQTT_SERVER[0], MQTT_SERVER[1], 60)
-        connOK = True
-    except:
-        connOK = False
-    time.sleep(2)
-
-# Blocking loop to the Mosquitto broker
-# mqtt_client.loop_forever()
-mqtt_client.loop_start()
-
-while True:
-    while len(incoming_queue) == 0:
+    # Set up a client for InfluxDB
+    connOK=False
+    while(connOK == False):
+        try:
+            db_client = InfluxDBClient(DB_SERVER[0], DB_SERVER[1], DB_USER, DB_PASS, DB_NAME)
+            connOK = True
+        except:
+            connOK = False
         time.sleep(2)
-    process_queue()
+    print("InfluxDB version: ", db_client.ping())
+
+    # check if database exists. if not, create it.
+    if any(a['name'] == DB_NAME for a in db_client.get_list_database()):
+        print('Database found: ', DB_NAME)
+    else:
+        print('Database not found. Creating...')
+        db_client.create_database(DB_NAME)
+        print('Database {} created'.format(DB_NAME))
+
+    # Initialize the MQTT client that should connect to the Mosquitto broker
+    mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
+    print('MQTT username: ', MQTT_USERNAME)
+    print('MQTT password: ', MQTT_PASSWORD)
+    mqtt_client.username_pw_set(username=MQTT_USERNAME, password=MQTT_PASSWORD)
+    connOK=False
+    while(connOK == False):
+        try:
+            mqtt_client.connect(MQTT_SERVER[0], MQTT_SERVER[1], 60)
+            connOK = True
+        except:
+            connOK = False
+        time.sleep(2)
+
+    # Blocking loop to the Mosquitto broker
+    # mqtt_client.loop_forever()
+    mqtt_client.loop_start()
+
+    while True:
+        while len(incoming_queue) == 0:
+            time.sleep(2)
+        db_payload = process_queue()
+
+        ## encode and send to database
+        print(db_payload)
+        try:
+            db_client.write_points(db_payload)
+            print("Finished writing to InfluxDB")
+        except:
+            print("** Error writing to InfluxDB **")
+
+if __name__ == '__main__':
+    main()
