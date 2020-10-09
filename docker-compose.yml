@@ -35,6 +35,7 @@ services:
     build: ./mqtt-influxdb-forwarder
     # container_name: mqttforwarder
     environment:
+      - BASE_TOPIC=${BASE_TOPIC}
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
       - INFLUXDB_DATABASE=${INFLUXDB_DATABASE}
