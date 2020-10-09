@@ -67,7 +67,7 @@ jobs:
       - name: Check sensor-readings table exists
         run: |
           sleep 10
-          docker exec migstack_influxdb_1 influx -database MIGStack -execute "SHOW MEASUREMENTS" | grep -q sensor-readings
+          docker exec migstack_influxdb_1 influx -database "MIGStack" -execute "SHOW MEASUREMENTS" | grep -q sensor-readings
 
       - name: Check sensor values in table
         run: |
