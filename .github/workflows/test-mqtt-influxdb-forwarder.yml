@@ -1,0 +1,36 @@
+# workflow for testing mqtt to influxdb forwarder script
+
+name: MQTT-InfluxDB-Forwarder Tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  # check if job can be called test
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Setup python
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      # change directory
+      - run: cd mqtt-influxdb-forwarder
+
+      # Install dependancies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Run tests
+      - name: Run tests with unittest
+        run: python -m unittest test_forwarder.py
