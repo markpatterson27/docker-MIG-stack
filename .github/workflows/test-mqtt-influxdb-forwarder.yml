@@ -23,14 +23,16 @@ jobs:
           python-version: '3.8'
 
       # change directory
-      - run: cd mqtt-influxdb-forwarder
+      # - run: cd mqtt-influxdb-forwarder && ls
 
       # Install dependancies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r mqtt-influxdb-forwarder/requirements.txt
 
       # Run tests
       - name: Run tests with unittest
-        run: python -m unittest test_forwarder.py
+        run: |
+          cd mqtt-influxdb-forwarder
+          python -m unittest test_forwarder.py
