@@ -77,3 +77,22 @@ jobs:
       # check grafana running
       - name: Check grafana cli exists
         run: docker exec migstack_grafana_1 grafana-cli -v | grep -q "Grafana CLI"
+
+      # check invalid messages are handled
+      - name: Check invalid messages handled
+        run: |
+          MESSAGE="{}"
+          mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
+          MESSAGE=string
+          mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
+          MESSAGE=7
+          mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
+          MESSAGE="{\"meta-data\":{\"device\":\"test\"}"
+          mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
+          MESSAGE="{\"measures\":{\"sensor1\":51,\"sensor2\":62}"
+          mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
+          sleep 5
+          MESSAGE="{\"meta-data\":{\"device\":\"test\"},\"measures\":{\"sensor1\":98,\"sensor2\":99}}"
+          mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
+          sleep 10
+          docker exec migstack_influxdb_1 influx -database "MIGStack" -execute "SELECT LAST(sensor1) FROM \"2_weeks\".\"sensor-readings\" WHERE device = 'test'" | grep -q 98
