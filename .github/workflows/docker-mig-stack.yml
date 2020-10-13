@@ -96,4 +96,5 @@ jobs:
           MESSAGE="{\"meta-data\":{\"device\":\"test\"},\"measures\":{\"sensor1\":98,\"sensor2\":99}}"
           mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
           sleep 10
+          docker logs migstack_forwarder_1
           docker exec migstack_influxdb_1 influx -database "MIGStack" -execute "SELECT LAST(sensor1) FROM \"2_weeks\".\"sensor-readings\" WHERE device = 'test'" | grep -q 98
