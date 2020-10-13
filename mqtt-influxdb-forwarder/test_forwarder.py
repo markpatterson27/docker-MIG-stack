@@ -249,7 +249,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
         expected_time = self.now
         self.assertEqual(response_time, expected_time)
 
-    def test_timestamp_maps(self):
+    def test_notimestamp_maps(self):
         '''
         test that if no timestamp exists one is created and mapped to time
         '''
