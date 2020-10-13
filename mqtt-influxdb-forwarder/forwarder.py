@@ -46,12 +46,20 @@ def on_message(client, userdata, msg):
     topic = msg.topic[len(BASE_TOPIC+'/'):]
     if any(pass_topic in topic for pass_topic in pass_topics) and topic != 'messages': # payload on device/sensor
         print(topic)
-        message = {
-            'topic': topic,
-            'payload': json.loads(msg.payload)#.decode("utf-8")
-        }
-        print(message['payload'])
-        incoming_queue.append(message)
+        try:
+            message = {
+                'topic': topic,
+                'payload': json.loads(msg.payload)#.decode("utf-8")
+            }
+            print(message['payload'])
+        except TypeError:   # catch invalid json deserialise
+            print("Invalid payload Type")
+            raise
+        except ValueError:
+            print("Invalid payload Value")
+            raise
+        else:
+            incoming_queue.append(message)
 
 def process_queue():
     global incoming_queue
