@@ -91,6 +91,7 @@ jobs:
           mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
           MESSAGE="{\"measures\":{\"sensor1\":51,\"sensor2\":62}"
           mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
+          mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -n -d
           sleep 5
           MESSAGE="{\"meta-data\":{\"device\":\"test\"},\"measures\":{\"sensor1\":98,\"sensor2\":99}}"
           mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/test/sensor-reading -m $MESSAGE -d
