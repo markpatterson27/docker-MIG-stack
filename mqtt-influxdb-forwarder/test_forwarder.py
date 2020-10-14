@@ -201,6 +201,8 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             },
         }
         self.payload_empty = {}
+        self.payload_int = 5
+        self.payload_string = 'string'
 
     def tearDown(self):
         '''
@@ -396,25 +398,32 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             self.assertEqual(len(response_payload),1)
             self.assertFalse(response_payload[0]['tags'])   # tags should be empty
 
-        with self.subTest('no measures'):
-            # message should not be processed
+    def test_invalid_payload_handled(self):
+        '''
+        test that invalid payloads are handled
+        
+        messages should not be processed and added to db if their payloads are not valid for the db
+           - payload with missing measures
+           - empty dict payload
+           - non dict payloads
+        '''
+        payloads = [self.payload_missing_measures, self.payload_empty, self.payload_int, self.payload_string]
 
-            payloads = [self.payload_missing_measures, self.payload_empty]
+        for payload in payloads:
+            # reset to empty queue
+            forwarder.incoming_queue = []
 
-            for payload in payloads:
-                # reset to empty queue
-                forwarder.incoming_queue = []
+            # add sensor-readings messsage
+            message = {
+                'topic': 'test/sensor-reading',
+                'payload': payload
+            }
+            forwarder.incoming_queue.append(message)
 
-                # add sensor-readings messsage
-                message = {
-                    'topic': 'test/sensor-reading',
-                    'payload': payload
-                }
-                forwarder.incoming_queue.append(message)
+            # process queue
+            response_payload = forwarder.process_queue()
 
-                # process queue
-                response_payload = forwarder.process_queue()
-
+            with self.subTest(payloads.index(payload)):
                 self.assertEqual(len(response_payload),0)
 
 
