@@ -186,6 +186,21 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
                 'sensor2': 2.4
             }
         }
+        self.payload_missing_metadata = {
+            'timestamp': self.now,
+            'measures': {
+                'sensor1': 1.3,
+                'sensor2': 2.4
+            }
+        }
+        self.payload_missing_measures = {
+            'timestamp': self.now,
+            'meta-data': {
+                'device': 'unittest',
+                'location': 'nowhere'
+            },
+        }
+        self.payload_empty = {}
 
     def tearDown(self):
         '''
@@ -358,6 +373,49 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             self.assertEqual(response_tags, expected_tags)
         with self.subTest('fields'):
             self.assertEqual(response_fields, expected_fields)
+
+    def test_partial_payload_handled(self):
+        '''
+        test that missing parts of payload is handled
+        '''
+        with self.subTest('no meta-data'):
+            # message should process, with no tags added to db_payload object
+            # reset to empty queue
+            forwarder.incoming_queue = []
+
+            # add sensor-readings messsage
+            message = {
+                'topic': 'test/sensor-reading',
+                'payload': self.payload_missing_metadata
+            }
+            forwarder.incoming_queue.append(message)
+
+            # process queue
+            response_payload = forwarder.process_queue()
+
+            self.assertEqual(len(response_payload),1)
+            self.assertFalse(response_payload[0]['tags'])   # tags should be empty
+
+        with self.subTest('no measures'):
+            # message should not be processed
+
+            payloads = [self.payload_missing_measures, self.payload_empty]
+
+            for payload in payloads:
+                # reset to empty queue
+                forwarder.incoming_queue = []
+
+                # add sensor-readings messsage
+                message = {
+                    'topic': 'test/sensor-reading',
+                    'payload': payload
+                }
+                forwarder.incoming_queue.append(message)
+
+                # process queue
+                response_payload = forwarder.process_queue()
+
+                self.assertEqual(len(response_payload),0)
 
 
 if __name__ == '__main__':
