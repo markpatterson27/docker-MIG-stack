@@ -54,10 +54,10 @@ def on_message(client, userdata, msg):
             print(message['payload'])
         except TypeError:   # catch invalid json deserialise
             print("Invalid payload Type")
-            raise
+            # raise
         except ValueError:
             print("Invalid payload Value")
-            raise
+            # raise
         else:
             incoming_queue.append(message)
 

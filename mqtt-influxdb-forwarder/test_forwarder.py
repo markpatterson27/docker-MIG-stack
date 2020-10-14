@@ -135,7 +135,8 @@ class Test_ForwarderOnMessage(unittest.TestCase):
                 # test response
                 with self.subTest(sub_topic+':'+str(test_payloads.index(test_payload))):
                     # call on_message() function
-                    self.assertRaises((TypeError,ValueError), forwarder.on_message, None, None, self.message)
+                    forwarder.on_message(None, None, self.message)
+                    # self.assertRaises((TypeError,ValueError), forwarder.on_message, None, None, self.message)
                     self.assertEqual(len(forwarder.incoming_queue),0)
 
 
