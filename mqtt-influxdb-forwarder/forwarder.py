@@ -73,7 +73,7 @@ def process_queue():
         print("Topic: {}".format(message['topic']))
 
         # process sensor readings if measures exist
-        if '/sensor' in message['topic'] and 'measures' in message['payload'].keys():
+        if '/sensor' in message['topic'] and isinstance(message['payload'], dict) and 'measures' in message['payload'].keys():
             last_child_topic = message['topic'].rsplit('/', 1)[1]
             print('last child topic: {}'.format(last_child_topic))
 
