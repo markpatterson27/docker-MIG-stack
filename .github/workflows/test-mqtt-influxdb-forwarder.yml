@@ -4,9 +4,13 @@ name: MQTT-InfluxDB-Forwarder Tests
 
 on:
   push:
-    branches: [ master ]
+    paths:
+      - 'mqtt-influxdb-forwarder/**'
   pull_request:
     branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   # check if job can be called test
