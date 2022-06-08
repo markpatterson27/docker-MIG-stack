@@ -121,12 +121,12 @@ class Test_ForwarderOnMessage(unittest.TestCase):
             with self.subTest(sub_topic):
                 self.assertEqual(len(forwarder.incoming_queue),0)
     
-    def test_empty_invalid_payload(self):
+    def test_empty_invalid_payload_json(self):
         '''
-        check empty or invalid payloads are caught and handled
+        check empty or invalid json payloads are caught and handled
         '''
         # topics to check
-        sub_topics = ['test/sensor-reading', 'test/sensor-error']
+        sub_topics = ['test/sensor-reading', 'test/sensor-error', 'test/sensor', 'test/sensors']
 
         test_payloads = [
             {},
