@@ -25,6 +25,8 @@ class Test_ForwarderOnMessage(unittest.TestCase):
 
         forwarder.incoming_queue = []
 
+        self.sensor_types = ['temperature', 'humidity', 'distance']
+
     def tearDown(self):
         '''
         '''
@@ -41,7 +43,7 @@ class Test_ForwarderOnMessage(unittest.TestCase):
             'test/sensor-error',
         ]
         sub_topics = sub_topics_json[:]
-        sensor_types = ['temperature', 'humidity', 'distance']
+        sensor_types = self.sensor_types
         for child_topic in ['sensor', 'sensors']:   # iterate over lists to generate repeating topics
             sub_topics.append(f'test/{child_topic}')
             for sensor_type in sensor_types:
@@ -95,6 +97,7 @@ class Test_ForwarderOnMessage(unittest.TestCase):
         '''
         # topics to check
         sub_topics = ['messages', 'test/messages', 'test/messages/location']
+        sub_topics.extend(self.sensor_types)
 
         for sub_topic in sub_topics:
             # reset queue to empty and check empty
