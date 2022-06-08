@@ -34,8 +34,8 @@ logging.basicConfig(
 )
 
 def on_connect(client, userdata, flags, rc):
-    print("Connected flags: ", str(flags))
-    print("Connected with result code: "+str(rc))
+    logging.info(f"Connected flags: {str(flags)}")
+    logging.info(f"Connected with result code: {str(rc)}")
     msg = {
         'Connected Client ID': MQTT_CLIENT_ID,
         'Subscribed channel': subscribe_topic,
@@ -44,11 +44,11 @@ def on_connect(client, userdata, flags, rc):
     }
     client.publish(BASE_TOPIC+'/messages', json.dumps(msg))
     client.subscribe(subscribe_topic)
-    print("Subscribed to topic: " + subscribe_topic)
+    logging.info(f"Subscribed to topic: {subscribe_topic}")
 
 def on_message(client, userdata, msg):
     global incoming_queue
-    print("Received a message on topic: " + msg.topic)
+    logging.info(f"Received a message on topic: {msg.topic}")
 
     # add topics to be processed to the list
     pass_topics = ['/sensor']
@@ -56,18 +56,18 @@ def on_message(client, userdata, msg):
     # strip out base topic
     topic = msg.topic[len(BASE_TOPIC+'/'):]
     if any(pass_topic in topic for pass_topic in pass_topics) and topic != 'messages': # payload on device/sensor
-        print(topic)
+        logging.info(topic)
         try:
             message = {
                 'topic': topic,
                 'payload': json.loads(msg.payload)#.decode("utf-8")
             }
-            print(message['payload'])
+            logging.info(message['payload'])
         except TypeError:   # catch invalid json deserialise
-            print("Invalid payload Type")
+            logging.warning(f"Invalid payload Type: {msg}")
             # raise
         except ValueError:
-            print("Invalid payload Value")
+            logging.warning(f"Invalid payload Value: {msg}")
             # raise
         else:
             incoming_queue.append(message)
@@ -81,12 +81,12 @@ def process_queue():
     for message in _queue:
         db_point = {}
 
-        print("Topic: {}".format(message['topic']))
+        logging.info("Topic: {}".format(message['topic']))
 
         # process sensor readings if measures exist
         if '/sensor' in message['topic'] and isinstance(message['payload'], dict) and 'measures' in message['payload'].keys():
             last_child_topic = message['topic'].rsplit('/', 1)[1]
-            print('last child topic: {}'.format(last_child_topic))
+            logging.info('last child topic: {}'.format(last_child_topic))
 
             if last_child_topic == "sensor-reading":
                 db_point['measurement'] = 'sensor-readings'
@@ -98,11 +98,11 @@ def process_queue():
             ## map timestamp
             # if timestamp exists
             if ('timestamp' in message['payload'].keys()):
-                print('ts found')
+                logging.info('ts found')
                 db_point['time'] = message['payload']['timestamp']
             else:
                 db_point['time'] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f%Z")
-                print('ts not found or too old')
+                logging.info('ts not found or too old')
             
             ## map tags
             db_point['tags'] = {}
@@ -114,7 +114,7 @@ def process_queue():
             fields = {}
             for k in message['payload']['measures'].keys():
                 fields[k] = message['payload']['measures'][k]
-                print("key: {}".format(k))
+                logging.info("key: {}".format(k))
             db_point['fields'] = fields
 
             db_payload.append(db_point)
@@ -124,7 +124,7 @@ def process_queue():
 
 def main():
     # start
-    print("Starting MQTT Forwarder...")
+    logging.info("Starting MQTT Forwarder...")
     # pause awhile while other containers startup
     time.sleep(50)
 
@@ -137,15 +137,15 @@ def main():
         except:
             connOK = False
         time.sleep(2)
-    print("InfluxDB version: ", db_client.ping())
+    logging.info(f"InfluxDB version: {db_client.ping()}")
 
     # check if database exists. if not, create it.
     if any(a['name'] == DB_NAME for a in db_client.get_list_database()):
-        print('Database found: ', DB_NAME)
+        logging.info(f'Database found: {DB_NAME}')
     else:
-        print('Database not found. Creating...')
+        logging.info('Database not found. Creating...')
         db_client.create_database(DB_NAME)
-        print('Database {} created'.format(DB_NAME))
+        logging.info('Database {} created'.format(DB_NAME))
 
     # Initialize the MQTT client that should connect to the Mosquitto broker
     mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
@@ -160,6 +160,7 @@ def main():
         except:
             connOK = False
         time.sleep(2)
+    logging.info('Connected to MQTT server')
 
     # Blocking loop to the Mosquitto broker
     # mqtt_client.loop_forever()
@@ -171,12 +172,12 @@ def main():
         db_payload = process_queue()
 
         ## encode and send to database
-        print(db_payload)
+        logging.info(db_payload)
         try:
             db_client.write_points(db_payload)
-            print("Finished writing to InfluxDB")
+            logging.info("Finished writing to InfluxDB")
         except:
-            print("** Error writing to InfluxDB **")
+            logging.warning(f"** Error writing to InfluxDB ** :{db_payload}")
 
 if __name__ == '__main__':
     main()
