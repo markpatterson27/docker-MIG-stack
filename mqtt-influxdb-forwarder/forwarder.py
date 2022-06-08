@@ -151,8 +151,6 @@ def main():
     mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
-    print('MQTT username: ', MQTT_USERNAME)
-    print('MQTT password: ', MQTT_PASSWORD)
     mqtt_client.username_pw_set(username=MQTT_USERNAME, password=MQTT_PASSWORD)
     connOK=False
     while(connOK == False):
