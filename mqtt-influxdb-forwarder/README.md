@@ -2,7 +2,7 @@
 
 Docker container with python script that forwards MQTT messages into an InfluxDB database.
 
-The forwarder script subsribes to all messages on a given base topic. The forwarder then filters and processes received messages, before writing data points to an InfluxDB database.
+The forwarder script subscribes to all messages on a given base topic. The forwarder then filters and processes received messages, before writing data points to an InfluxDB database.
 
 <br />
 

@@ -239,7 +239,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             # reset to empty queue
             forwarder.incoming_queue = []
 
-            # add sensor-readings messsage
+            # add sensor-readings message
             message = {
                 'topic': 'test/' + topic,
                 'payload': self.payload_timestamped
@@ -266,7 +266,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             # reset to empty queue
             forwarder.incoming_queue = []
 
-            # add sensor-readings messsage
+            # add sensor-readings message
             message = {
                 'topic': topic,
                 'payload': self.payload_timestamped
@@ -287,7 +287,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
         # reset to empty queue
         forwarder.incoming_queue = []
 
-        # add sensor-readings messsage
+        # add sensor-readings message
         message = {
             'topic': 'test/sensor-reading',
             'payload': self.payload_timestamped
@@ -311,7 +311,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
         # reset to empty queue
         forwarder.incoming_queue = []
 
-        # add sensor-readings messsage
+        # add sensor-readings message
         message = {
             'topic': 'test/sensor-reading',
             'payload': self.payload_notimestamp
@@ -355,7 +355,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
         # reset to empty queue
         forwarder.incoming_queue = []
 
-        # add sensor-readings messsage
+        # add sensor-readings message
         message = {
             'topic': 'test/sensor-reading',
             'payload': self.payload_timestamped
@@ -386,7 +386,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             # reset to empty queue
             forwarder.incoming_queue = []
 
-            # add sensor-readings messsage
+            # add sensor-readings message
             message = {
                 'topic': 'test/sensor-reading',
                 'payload': self.payload_missing_metadata
@@ -414,7 +414,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             # reset to empty queue
             forwarder.incoming_queue = []
 
-            # add sensor-readings messsage
+            # add sensor-readings message
             message = {
                 'topic': 'test/sensor-reading',
                 'payload': payload
