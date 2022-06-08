@@ -6,6 +6,7 @@ from influxdb import InfluxDBClient
 import time, datetime
 import json
 import os
+import logging
 
 # define constants
 MQTT_SERVER = ('mqtt', 1883) # ip, port
@@ -21,6 +22,16 @@ DB_NAME = os.getenv('INFLUXDB_DATABASE', 'MIGStack')
 
 subscribe_topic = BASE_TOPIC+'/#'
 incoming_queue = []
+
+# config logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(funcName)s():%(lineno)s - %(message)s",
+    handlers=[
+        # logging.FileHandler("forwarder.log"),
+        logging.StreamHandler()
+    ]
+)
 
 def on_connect(client, userdata, flags, rc):
     print("Connected flags: ", str(flags))
