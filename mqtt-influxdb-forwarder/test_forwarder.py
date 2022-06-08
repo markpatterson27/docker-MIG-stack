@@ -6,7 +6,10 @@ import datetime
 import forwarder
 
 class Test_ForwarderOnMessage(unittest.TestCase):
-    ''' test on_message callback function
+    ''' 
+    test on_message callback function
+
+    on_message strips out base topic from messages and filters messages on sub-topics and valid payload
     '''
     
     def setUp(self):
