@@ -16,14 +16,26 @@ All messages on the base topic are subscribed to: i.e. `BASE_TOPIC+'/#'`. The fo
 
 | Topic | Description |
 | --- | --- |
-| last child topic: `/sensor-reading` | Any message with the last child topic of `sensor-reading`. |
+| last child topic: [`/sensor-reading`, `/sensor`] | Any message with the last child topic of `sensor-reading`, `sensor` or `sensors`. |
 | last child topic: `/sensor-errors` | Any message with the last child topic of `sensor-errors`. |
+| last child topic: [`/temperature`, `/humidity`, `/distance`] | Message with the last child topic one of [`/temperature`, `/humidity`, `/distance`] and with a middle child topic. Middle child topic will be used as a tag. |
 
 <br />
 
-### MQTT Payload
+### MQTT Payloads
 
-The MQTT payload is expected to be in the format:
+The MQTT payload is expected to be in one of the following formats:
+
+| Topic | Payload |
+| --- | --- |
+| base-topic/+/sensor<br>base-topic/+/sensor-reading<br>ase-topic/+/sensor-error | JSON |
+| base-topic/+/temperature<br>base-topic/+/sensor/temperature | Single number<br>+ middle topic parsed as ID tag |
+
+
+
+#### JSON
+
+If the last child topic contains `sensor` the payload is expect to be in JSON with the following keys.
 
 ```js
 payload {
@@ -40,6 +52,29 @@ payload {
         "<dictionary of sensor readings>"
     }
 }
+```
+
+Alternative keys
+
+```js
+payload {
+    "time": "<timestamp of reading>",
+    "tags": {
+        "<dictionary of meta-data associated with sensor reading>"
+    },
+    "fields": {
+        "<dictionary of sensor readings>"
+    }
+}
+```
+
+#### Single Numeric Value
+
+Messages with a last child topic that is a sensor type will have a payload with a single numeric value. Middle child topic will be used as a ID tag.
+
+```
+Topic: /_sensor-type_
+Payload: single numeric value
 ```
 
 ## InfluxDB Data Points
