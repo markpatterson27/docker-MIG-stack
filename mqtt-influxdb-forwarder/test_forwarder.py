@@ -36,7 +36,16 @@ class Test_ForwarderOnMessage(unittest.TestCase):
         iterates over list of topics
         '''
         # topics to check
-        sub_topics = ['test/sensor-reading', 'test/sensor-error']
+        sub_topics_json = [
+            'test/sensor-reading',
+            'test/sensor-error',
+        ]
+        sub_topics = sub_topics_json[:]
+        sensor_types = ['temperature', 'humidity', 'distance']
+        for child_topic in ['sensor', 'sensors']:   # iterate over lists to generate repeating topics
+            sub_topics.append(f'test/{child_topic}')
+            for sensor_type in sensor_types:
+                sub_topics.append(f'test/{child_topic}/{sensor_type}')
 
         for sub_topic in sub_topics:
             # reset queue to empty and check empty
@@ -49,15 +58,19 @@ class Test_ForwarderOnMessage(unittest.TestCase):
             self.message.topic = test_topic.encode()
 
             # set message payload
-            test_payload = {
-                'timestamp': 0,
-                'meta-date': {},
-                'measures': {}
-            }
-            expected_payload = test_payload
-            self.message.payload = json.dumps(test_payload)
-
+            if sub_topic in sub_topics_json:
+                test_payload = {
+                    'timestamp': 0,
+                    'meta-date': {},
+                    'measures': {}
+                }
+                self.message.payload = json.dumps(test_payload)
+            else:
+                test_payload = 5
+                self.message.payload = test_payload #TODO: check how raw numbers are sent
+            
             # expected response
+            expected_payload = test_payload
             expected_response = [{
                 'topic': expected_topic,
                 'payload': expected_payload
@@ -72,7 +85,8 @@ class Test_ForwarderOnMessage(unittest.TestCase):
                 with self.subTest(i):
                     self.assertEqual(len(forwarder.incoming_queue),i+1)
                     self.assertEqual(forwarder.incoming_queue[i]['topic'], expected_topic)
-                    self.assertDictEqual(forwarder.incoming_queue[i]['payload'], expected_payload)
+                    # self.assertDictEqual(forwarder.incoming_queue[i]['payload'], expected_payload)
+                    self.assertDictEqual(forwarder.incoming_queue[i], expected_response[0])
 
     def test_not_added_to_queue(self):
         '''
