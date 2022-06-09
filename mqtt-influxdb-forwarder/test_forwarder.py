@@ -25,7 +25,26 @@ class Test_ForwarderOnMessage(unittest.TestCase):
 
         forwarder.incoming_queue = []
 
-        self.sensor_types = ['temperature', 'humidity', 'distance']
+        # create topics
+        self.sensor_types = forwarder.sensor_topics
+        self.sub_topics_json = [
+            'test/sensor-reading',
+            'test/sensor-error',
+            'test/sensor',
+            'test/sensors',
+        ]
+        self.sub_topics_numeric = [f'test/{child}{type}' for child in ['', 'sensor/', 'sensors/'] for type in self.sensor_types]
+            # i.e.
+            # 'test/sensor/temperature',
+            # 'test/sensor/humidity',
+            # 'test/sensor/distance',
+            # 'test/sensors/temperature',
+            # 'test/sensors/humidity',
+            # 'test/sensors/distance',
+            # 'test/temperature',
+            # 'test/humidity',
+            # 'test/distance',
+
 
     def tearDown(self):
         '''

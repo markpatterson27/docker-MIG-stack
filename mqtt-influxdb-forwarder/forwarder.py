@@ -33,6 +33,9 @@ logging.basicConfig(
     ]
 )
 
+# supported last child sensor topics
+sensor_topics = ['temperature', 'humidity', 'distance']
+
 def on_connect(client, userdata, flags, rc):
     logging.info(f"Connected flags: {str(flags)}")
     logging.info(f"Connected with result code: {str(rc)}")
