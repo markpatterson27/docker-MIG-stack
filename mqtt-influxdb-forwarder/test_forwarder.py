@@ -354,9 +354,9 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
 
     def test_not_sensor_topics_dont_map_to_any_measure(self):
         '''
-        test that none sensor topics don't map to a measure in db payload
+        test that non-valid sensor topics don't map to a measure in db payload
         '''
-        topics = ['nonsense', 'test/nonsense', 'messages', 'test/messages/location']
+        topics = ['nonsense', 'test/nonsense', 'messages', 'test/messages/location', *self.sensor_types]
 
         for topic in topics:
             # reset to empty queue
@@ -365,7 +365,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             # add sensor-readings message
             message = {
                 'topic': topic,
-                'payload': self.payload_timestamped
+                'payload': 5 if topic in self.sensor_types else self.payload_timestamped
             }
             forwarder.incoming_queue.append(message)
 
