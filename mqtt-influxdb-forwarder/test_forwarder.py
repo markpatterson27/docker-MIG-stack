@@ -473,6 +473,35 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
         with self.subTest('fields'):
             self.assertEqual(response_fields, expected_fields)
 
+    def test_tags_and_fields_map(self): # TODO
+        '''
+        test that tags maps to tags and fields map to fields
+        '''
+        # reset to empty queue
+        forwarder.incoming_queue = []
+
+        # add sensor-readings message
+        message = {
+            'topic': 'test/sensor-reading',
+            'payload': self.payload_alt_keys
+        }
+        forwarder.incoming_queue.append(message)
+
+        # process queue
+        response_payload = forwarder.process_queue()
+
+        response_tags = response_payload[0]['tags']
+        expected_tags = self.payload_alt_keys['tags']
+
+        response_fields = response_payload[0]['fields']
+        expected_fields = self.payload_alt_keys['fields']
+
+        # test response
+        with self.subTest('tags'): 
+            self.assertDictEqual(response_tags, expected_tags)
+        with self.subTest('fields'):
+            self.assertDictEqual(response_fields, expected_fields)
+
     def test_partial_payload_handled(self):
         '''
         test that missing parts of payload is handled
