@@ -524,7 +524,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             self.assertEqual(len(response_payload),1)
             self.assertFalse(response_payload[0]['tags'])   # tags should be empty
 
-    def test_invalid_payload_handled(self):
+    def test_json_topics_invalid_payload_handled(self):
         '''
         test that invalid payloads are handled
         
