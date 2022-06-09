@@ -325,6 +325,33 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
                 self.assertEqual(response_measurement, expected_measurement)
             # print(topic, 'maps')
 
+    def test_numeric_sensor_topics_map_to_measure(self):
+        '''
+        test that sensor type topics map to corresponding measures in db payload
+        '''
+        topics = self.sub_topics_numeric
+
+        for topic in topics:
+            for payload in range(20,40,2):
+                # reset to empty queue
+                forwarder.incoming_queue = []
+
+                # add sensor-readings message
+                message = {
+                    'topic': topic,
+                    'payload': payload/10
+                }
+                forwarder.incoming_queue.append(message)
+
+                # process queue
+                response_payload = forwarder.process_queue()
+
+                # test response
+                response_measurement = response_payload[0]['measurement']
+                expected_measurement = 'sensor-readings'
+                with self.subTest(f'{topic}:{payload}'):
+                    self.assertEqual(response_measurement, expected_measurement)
+
     def test_not_sensor_topics_dont_map_to_any_measure(self):
         '''
         test that none sensor topics don't map to a measure in db payload
