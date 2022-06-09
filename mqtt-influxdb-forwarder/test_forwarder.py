@@ -229,51 +229,35 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
         self.now = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f%Z")
 
         # define some reuseable payloads
+        meta_data = {'device': 'unittest', 'location': 'nowhere'}
+        measures = {'sensor1': 1.3, 'sensor2': 2.4}
+
         self.payload_timestamped = {
             'timestamp': self.now,
-            'meta-data': {
-                'device': 'unittest',
-                'location': 'nowhere'
-            },
-            'measures': {
-                'sensor1': 1.3,
-                'sensor2': 2.4
-            }
+            'meta-data': meta_data,
+            'measures': measures
         }
         self.payload_oldtimestamp = {
             'timestamp': "2000-01-01T00:00:00Z",
-            'meta-data': {
-                'device': 'unittest',
-                'location': 'nowhere'
-            },
-            'measures': {
-                'sensor1': 1.3,
-                'sensor2': 2.4
-            }
+            'meta-data': meta_data,
+            'measures': measures
         }
         self.payload_notimestamp = {
-            'meta-data': {
-                'device': 'unittest',
-                'location': 'nowhere'
-            },
-            'measures': {
-                'sensor1': 1.3,
-                'sensor2': 2.4
-            }
+            'meta-data': meta_data,
+            'measures': measures
         }
         self.payload_missing_metadata = {
             'timestamp': self.now,
-            'measures': {
-                'sensor1': 1.3,
-                'sensor2': 2.4
-            }
+            'measures': measures
         }
         self.payload_missing_measures = {
             'timestamp': self.now,
-            'meta-data': {
-                'device': 'unittest',
-                'location': 'nowhere'
-            },
+            'meta-data': meta_data
+        }
+        self.payload_alt_keys = {
+            'time': self.now,
+            'tags': meta_data,
+            'fields': measures
         }
         self.payload_empty = {}
         self.payload_int = 5
