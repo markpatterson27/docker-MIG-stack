@@ -97,43 +97,64 @@ def process_queue():
     for message in _queue:
         db_point = {}
 
-        logging.info("Topic: {}".format(message['topic']))
+        logging.info(f"Topic: {message['topic']}")
 
-        # process sensor readings if measures exist
-        if '/sensor' in message['topic'] and isinstance(message['payload'], dict) and 'measures' in message['payload'].keys():
-            last_child_topic = message['topic'].rsplit('/', 1)[1]
-            logging.info('last child topic: {}'.format(last_child_topic))
+        topic_parts = message['topic'].split('/')
+        logging.info(f'last child topic: {topic_parts[-1]}')
 
-            if last_child_topic == "sensor-reading":
-                db_point['measurement'] = 'sensor-readings'
-            elif last_child_topic == "sensor-error":
+        # if topic numeric
+        if topic_parts[-1] in sensor_topics and len(topic_parts) >= 2 and isinstance(message['payload'], (int,float)):
+            logging.info('processing payload as numeric')
+            db_point['measurement'] = 'sensor-readings'
+            db_point['time'] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f%Z")
+            db_point['tags'] = {'id': topic_parts[0]}
+            db_point['fields'] = {
+                f'{topic_parts[-1]}': message['payload']    #TODO consider wrapping payload in float()
+            }
+            db_payload.append(db_point)
+
+        # elif topic json
+        elif topic_parts[-1].startswith('sensor') and isinstance(message['payload'], dict) and any(k in message['payload'].keys() for k in ['measures','fields']):
+            logging.info('processing payload as json')
+
+            ## set measure
+            if topic_parts[-1] == "sensor-error":
                 db_point['measurement'] = 'sensor-errors'
             else:
-                break
+                db_point['measurement'] = 'sensor-readings'
 
             ## map timestamp
             # if timestamp exists
-            if ('timestamp' in message['payload'].keys()):
-                logging.info('ts found')
-                db_point['time'] = message['payload']['timestamp']
+            t_keys = [k for k in ['timestamp','time'] if k in message['payload'].keys()]
+            if t_keys:
+                logging.info(f'ts found: {t_keys}')
+                db_point['time'] = message['payload'][t_keys[0]]
             else:
+                logging.info('ts not found')
                 db_point['time'] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f%Z")
-                logging.info('ts not found or too old')
-            
+            #TODO check if ts too old; i.e. epoch 0
+
             ## map tags
             db_point['tags'] = {}
-            if 'meta-data' in message['payload'].keys():    # check payload has meta-data
-                for k in message['payload']['meta-data'].keys():
-                    db_point['tags'][k] = message['payload']['meta-data'][k]
+            tag_keys = [k for k in ['meta-data','tags'] if k in message['payload'].keys()]
+            if tag_keys:
+                logging.info(f'tags found: {tag_keys}')
+                for k in message['payload'][tag_keys[0]].keys():
+                    db_point['tags'][k] = message['payload'][tag_keys[0]][k]
 
             ## map fields
-            fields = {}
-            for k in message['payload']['measures'].keys():
-                fields[k] = message['payload']['measures'][k]
-                logging.info("key: {}".format(k))
-            db_point['fields'] = fields
+            db_point['fields'] = {}
+            f_keys = [k for k in ['measures','fields'] if k in message['payload'].keys()]
+            if f_keys:
+                logging.info(f'fields found: {f_keys}')
+                for k in message['payload'][f_keys[0]].keys():
+                    logging.info(f'key: {k}')
+                    db_point['fields'][k] = message['payload'][f_keys[0]][k]
 
             db_payload.append(db_point)
+
+        else:
+            logging.info('not processing')
 
     return db_payload
 
