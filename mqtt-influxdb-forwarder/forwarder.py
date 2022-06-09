@@ -50,22 +50,35 @@ def on_connect(client, userdata, flags, rc):
     logging.info(f"Subscribed to topic: {subscribe_topic}")
 
 def on_message(client, userdata, msg):
+    '''
+    allow last child topics
+        /sensor*
+        /temperature
+        /humidity
+        /distance
+    other topics or invalid payloads should be filtered out
+    '''
     global incoming_queue
     logging.info(f"Received a message on topic: {msg.topic}")
 
-    # add topics to be processed to the list
-    pass_topics = ['/sensor']
+    # # add topics to be processed to the list
+    # pass_topics = ['/sensor']
 
     # strip out base topic
     topic = msg.topic[len(BASE_TOPIC+'/'):]
-    if any(pass_topic in topic for pass_topic in pass_topics) and topic != 'messages': # payload on device/sensor
-        logging.info(topic)
+    topic_parts = topic.split('/')
+
+    # if last child topic is sensor type, payload should be numeric # else if last child topic is 'sensor', payload should be json
+    if (topic_parts[-1] in sensor_topics and len(topic_parts) >= 2) or topic_parts[-1].startswith('sensor'):
+        logging.info(f'Processing topic: {topic}')
+
         try:
+            payload = float(msg.payload) if topic_parts[-1] in sensor_topics else json.loads(msg.payload)#.decode("utf-8")
+            logging.info(f'  With payload: {payload}')
             message = {
                 'topic': topic,
-                'payload': json.loads(msg.payload)#.decode("utf-8")
+                'payload': payload
             }
-            logging.info(message['payload'])
         except TypeError:   # catch invalid json deserialise
             logging.warning(f"Invalid payload Type: {msg}")
             # raise
