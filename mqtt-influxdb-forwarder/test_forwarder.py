@@ -298,11 +298,11 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
         forwarder.process_queue()
         self.assertFalse(forwarder.incoming_queue)
 
-    def test_sensor_topics_map_to_measure(self):
+    def test_json_sensor_topics_map_to_measure(self):
         '''
-        test that sensor-reading and sensor-error topics map to corresponding measures in db payload
+        test that sensor* topics map to corresponding measures in db payload
         '''
-        topics = ['sensor-reading', 'sensor-error']
+        topics = self.sub_topics_json
 
         for topic in topics:
             # reset to empty queue
@@ -310,7 +310,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
 
             # add sensor-readings message
             message = {
-                'topic': 'test/' + topic,
+                'topic': topic,
                 'payload': self.payload_timestamped
             }
             forwarder.incoming_queue.append(message)
@@ -320,7 +320,7 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
 
             # test response
             response_measurement = response_payload[0]['measurement']
-            expected_measurement = topic + 's'
+            expected_measurement = 'sensor-errors' if topic.split('/')[-1] == 'sensor-error' else 'sensor-readings'
             with self.subTest(topic):
                 self.assertEqual(response_measurement, expected_measurement)
             # print(topic, 'maps')
