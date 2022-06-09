@@ -552,6 +552,46 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
             with self.subTest(payloads.index(payload)):
                 self.assertEqual(len(response_payload),0)
 
+    def test_numeric_payload_maps(self): #TODO
+        '''
+        test that sensor type topics with numeric payloads are mapped
+
+        timestamp should be added
+        middle child topic should be ID tag
+        '''
+
+        payload_value = 15.5
+        id_values = ['test', 'ABC', '67FE2D', '1234']
+
+        for id_value in id_values:
+            # reset to empty queue
+            forwarder.incoming_queue = []
+
+            # add sensor-readings message
+            message = {
+                'topic': f'{id_value}/temperature',
+                'payload': payload_value
+            }
+            forwarder.incoming_queue.append(message)
+
+            # process queue
+            response_payload = forwarder.process_queue()
+
+            # datetime compare
+            with self.subTest(f'{str(id_values.index(id_value))}:time'): 
+                response_time = datetime.datetime.strptime(response_payload[0]['time'], "%Y-%m-%dT%H:%M:%S.%f")
+                expected_time = datetime.datetime.utcnow()
+                self.assertAlmostEqual(response_time, expected_time, delta=datetime.timedelta(seconds=15))
+
+            with self.subTest(f'{str(id_values.index(id_value))}:tags'):
+                response_tags = response_payload[0]['tags']
+                expected_tags = {'id': id_value}
+                self.assertDictEqual(response_tags, expected_tags)
+
+            with self.subTest(f'{str(id_values.index(id_value))}:fields'):
+                response_fields = response_payload[0]['fields']
+                expected_fields = {'temperature': payload_value}
+                self.assertDictEqual(response_fields, expected_fields)
 
 if __name__ == '__main__':
     unittest.main()
