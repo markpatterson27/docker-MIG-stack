@@ -209,7 +209,13 @@ class Test_ForwarderOnMessage(unittest.TestCase):
 
 
 class Test_ForwarderProcessQueue(unittest.TestCase):
-    ''' test process_queue function
+    '''
+    test process_queue function
+
+    process_queue processes valid messages into a format ready to be written to
+    the database.
+    Valid messages are either a float (or int) on sensor type topics, or a
+    dictionary with a 'measures' or 'fields' key.
     '''
 
     def setUp(self):
