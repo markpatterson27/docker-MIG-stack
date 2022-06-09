@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    # Look for a `Dockerfile` in the `root` directory
+    directory: "/"
+    # Check for updates once a week
+    schedule:
+      interval: "monthly"
+    # target-branch: dependency-updates
+    # labels:
+    #   - "docker dependencies"
+
+  # Enable version updates for pip
+  - package-ecosystem: "pip"
+    # Look for `package.json` and `lock` files in the `root` directory
+    directory: "/mqtt-influxdb-forwarder"
+    # Check the npm registry for updates every day (weekdays)
+    schedule:
+      interval: "monthly"
+    # target-branch: dependency-updates
+    # labels:
+    #   - "pip dependencies"
+
+  # Enable version updates for actions
+  - package-ecosystem: "github-actions"
+    # Workflow files stored in the
+    # default location of `.github/workflows`
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    # target-branch: dependency-updates
+    # labels:
+    #   - "workflow dependencies"
