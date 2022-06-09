@@ -57,16 +57,7 @@ class Test_ForwarderOnMessage(unittest.TestCase):
         iterates over list of topics
         '''
         # topics to check
-        sub_topics_json = [
-            'test/sensor-reading',
-            'test/sensor-error',
-        ]
-        sub_topics = sub_topics_json[:]
-        sensor_types = self.sensor_types
-        for child_topic in ['sensor', 'sensors']:   # iterate over lists to generate repeating topics
-            sub_topics.append(f'test/{child_topic}')
-            for sensor_type in sensor_types:
-                sub_topics.append(f'test/{child_topic}/{sensor_type}')
+        sub_topics = [*self.sub_topics_json, *self.sub_topics_numeric] # merge both topic lists
 
         for sub_topic in sub_topics:
             # reset queue to empty and check empty
@@ -79,7 +70,7 @@ class Test_ForwarderOnMessage(unittest.TestCase):
             self.message.topic = test_topic.encode()
 
             # set message payload
-            if sub_topic in sub_topics_json:
+            if sub_topic in self.sub_topics_json:
                 test_payload = {
                     'timestamp': 0,
                     'meta-date': {},
@@ -145,7 +136,7 @@ class Test_ForwarderOnMessage(unittest.TestCase):
         check empty or invalid json payloads are caught and handled
         '''
         # topics to check
-        sub_topics = ['test/sensor-reading', 'test/sensor-error', 'test/sensor', 'test/sensors']
+        sub_topics = self.sub_topics_json
 
         test_payloads = [
             {},
