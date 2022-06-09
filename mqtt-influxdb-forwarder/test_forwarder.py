@@ -169,6 +169,44 @@ class Test_ForwarderOnMessage(unittest.TestCase):
                     # self.assertRaises((TypeError,ValueError), forwarder.on_message, None, None, self.message)
                     self.assertEqual(len(forwarder.incoming_queue),0)
 
+    def test_empty_invalid_payload_numeric(self):
+        '''
+        check empty or invalid numeric payloads are caught and handled
+        '''
+        # topics to check
+        sub_topics = self.sub_topics_numeric
+
+        test_payloads = [
+            {},
+            [{}],
+            json.dumps({}),
+            'string',
+            '',
+            bytes(4),
+            json.dumps('string'),
+            # 7
+        ]
+
+        for sub_topic in sub_topics:
+            for test_payload in test_payloads:
+                # reset queue to empty and check empty
+                forwarder.incoming_queue = []
+                self.assertEqual(len(forwarder.incoming_queue),0)
+
+                # set message topic
+                test_topic = forwarder.BASE_TOPIC + '/' + sub_topic
+                self.message.topic = test_topic.encode()
+
+                # set message payload
+                self.message.payload = test_payload
+
+                # test response
+                with self.subTest(sub_topic+':'+str(test_payloads.index(test_payload))):
+                    # call on_message() function
+                    forwarder.on_message(None, None, self.message)
+                    # self.assertRaises((TypeError,ValueError), forwarder.on_message, None, None, self.message)
+                    self.assertEqual(len(forwarder.incoming_queue),0)
+
 
 class Test_ForwarderProcessQueue(unittest.TestCase):
     ''' test process_queue function
