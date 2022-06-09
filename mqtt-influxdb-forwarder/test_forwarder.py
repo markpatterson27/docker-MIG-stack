@@ -5,6 +5,27 @@ import datetime
 # forwarder = __import__("forwarder.py")
 import forwarder
 
+# create topics
+sensor_types = forwarder.sensor_topics
+sub_topics_json = [
+    'test/sensor-reading',
+    'test/sensor-error',
+    'test/sensor',
+    'test/sensors',
+]
+sub_topics_numeric = [f'test/{child}{type}' for child in ['', 'sensor/', 'sensors/'] for type in sensor_types]
+    # i.e.
+    # 'test/sensor/temperature',
+    # 'test/sensor/humidity',
+    # 'test/sensor/distance',
+    # 'test/sensors/temperature',
+    # 'test/sensors/humidity',
+    # 'test/sensors/distance',
+    # 'test/temperature',
+    # 'test/humidity',
+    # 'test/distance',
+
+
 class Test_ForwarderOnMessage(unittest.TestCase):
     ''' 
     test on_message callback function
@@ -25,25 +46,10 @@ class Test_ForwarderOnMessage(unittest.TestCase):
 
         forwarder.incoming_queue = []
 
-        # create topics
-        self.sensor_types = forwarder.sensor_topics
-        self.sub_topics_json = [
-            'test/sensor-reading',
-            'test/sensor-error',
-            'test/sensor',
-            'test/sensors',
-        ]
-        self.sub_topics_numeric = [f'test/{child}{type}' for child in ['', 'sensor/', 'sensors/'] for type in self.sensor_types]
-            # i.e.
-            # 'test/sensor/temperature',
-            # 'test/sensor/humidity',
-            # 'test/sensor/distance',
-            # 'test/sensors/temperature',
-            # 'test/sensors/humidity',
-            # 'test/sensors/distance',
-            # 'test/temperature',
-            # 'test/humidity',
-            # 'test/distance',
+        # define topics to use
+        self.sensor_types = sensor_types
+        self.sub_topics_json = sub_topics_json
+        self.sub_topics_numeric = sub_topics_numeric
 
 
     def tearDown(self):
@@ -262,6 +268,11 @@ class Test_ForwarderProcessQueue(unittest.TestCase):
         self.payload_empty = {}
         self.payload_int = 5
         self.payload_string = 'string'
+
+        # define topics to use
+        self.sensor_types = sensor_types
+        self.sub_topics_json = sub_topics_json
+        self.sub_topics_numeric = sub_topics_numeric
 
     def tearDown(self):
         '''
