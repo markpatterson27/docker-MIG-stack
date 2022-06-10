@@ -1,5 +1,5 @@
 # FROM toke/mosquitto
-FROM eclipse-mosquitto
+FROM eclipse-mosquitto:2
 
 ARG MQTT_USERNAME
 ARG MQTT_PASSWORD

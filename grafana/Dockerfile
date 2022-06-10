@@ -1,5 +1,4 @@
-# FROM grafana/grafana-arm32v7-linux
-FROM grafana/grafana
+FROM grafana/grafana:8.5.5
 
 COPY provisioning /etc/grafana/provisioning
 COPY dashboards /var/lib/grafana/dashboards
