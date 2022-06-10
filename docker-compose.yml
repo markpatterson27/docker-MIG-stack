@@ -57,6 +57,20 @@ services:
       - INFLUXDB_DATABASE=${INFLUXDB_DATABASE}
     restart: unless-stopped
 
+  ntp:
+    # build: .
+    image: cturra/ntp:latest
+    # container_name: ntp
+    restart: always
+    ports:
+      - 123:123/udp
+    cap_add:
+      - SYS_NICE
+      - SYS_RESOURCE
+      - SYS_TIME
+    environment:
+      - NTP_SERVERS=time.cloudflare.com,time1.google.com
+
 volumes:
   influxdb_data:
   grafana_data:
