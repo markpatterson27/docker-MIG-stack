@@ -20,6 +20,14 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    # Configure testing on different architectures
+    # arm/v7   - i.e. Raspberry Pi 32bit
+    # arm64/v8 - i.e. Raspberry Pi 64bit
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm/v7, arm64/v8]
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -40,9 +48,16 @@ jobs:
       #     sudo systemctl stop mosquitto.service
       #     mosquitto -d -v -p 1888
 
+      # Install the qemu packages
+      - name: Setup multi-arch docker support
+        if: ${{ matrix.arch != 'amd64' }}
+        run: |
+          sudo apt-get install qemu binfmt-support qemu-user-static
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
       # build and run stack
       - name: Compose up
-        run: docker-compose -f "docker-compose.yml" up -d --build
+        run: DOCKER_DEFAULT_PLATFORM=linux/${{ matrix.arch }} docker-compose -f "docker-compose.yml" up -d --build
 
       # show running containers
       - name: show running containers
