@@ -1,15 +1,24 @@
 version: 2
 updates:
   # Enable version updates for Docker
+  # Docker compose currently not supported: https://github.com/dependabot/dependabot-core/issues/390
+  # Dependabot currently doesn't support multi dirs: https://github.com/dependabot/dependabot-core/issues/2178
   - package-ecosystem: "docker"
-    # Look for a `Dockerfile` in the `root` directory
-    directory: "/"
-    # Check for updates once a week
+    directory: "/grafana"
     schedule:
       interval: "monthly"
-    # target-branch: dependency-updates
-    # labels:
-    #   - "docker dependencies"
+  - package-ecosystem: "docker"
+    directory: "/influxdb"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "docker"
+    directory: "/mqtt"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "docker"
+    directory: "/mqtt-influxdb-forwarder"
+    schedule:
+      interval: "monthly"
 
   # Enable version updates for pip
   - package-ecosystem: "pip"
