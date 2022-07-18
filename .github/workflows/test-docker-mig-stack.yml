@@ -70,6 +70,10 @@ jobs:
             echo "$service : $(docker-compose -f "docker-compose.yml" exec -T $service uname -m)"
           done
 
+      # pause to wait for container services to spin up
+      - name: Pause
+        run: sleep 10
+
       # check that mosquitto can publish a message
       - name: Mosquitto publish
         run: mosquitto_pub -h 127.0.0.1 -p 1883 -u mqtt -P password -t mig-stack/messages -m "hello runner" -d
